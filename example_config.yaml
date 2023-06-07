@@ -1,0 +1,21 @@
+connectors:
+  matrix:
+    homeserver: "https://matrix.cadair.com"
+    access_token: ""
+    send_m_notice: true
+    rooms:
+      main: ""
+
+welcome-message: false
+
+logging:
+  console: true
+
+databases:
+  matrix:
+    single_state_key: false
+
+skills:
+  hello:
+  github:
+    path: /home/stuart/Git/skill-github-linker/
