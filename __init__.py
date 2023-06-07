@@ -63,8 +63,11 @@ class GitHubLinks(Skill):
         repo = message.entities['repository']['value'] or default_repo
         issue_number = message.entities['issue_number']['value']
         if default_org is None or default_repo is None:
-            await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
-                                        linked_event=message))
+            reminder_sent = await self.opsdroid.memory.get("default_repo_reminder_sent")
+            if not reminder_sent:
+                await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
+                                            linked_event=message))
+                await self.opsdroid.memory.put("default_repo_reminder_sent", True)
             return
 
         issue = await self.lookup_issue(org, repo, issue_number)
