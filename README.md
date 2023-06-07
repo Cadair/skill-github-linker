@@ -1,2 +1,2 @@
-An opsdroid skill for Amaetur Radio Related Things
-==================================================
+An opsdroid skill for Linking to GitHub Issues
+==============================================

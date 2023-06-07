@@ -16,6 +16,5 @@ databases:
     single_state_key: false
 
 skills:
-  hello:
   github:
-    path: /home/stuart/Git/skill-github-linker/
+    repo: https://github.com/Cadair/skill-github-linker
