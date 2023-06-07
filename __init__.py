@@ -5,7 +5,7 @@ import aiohttp
 from opsdroid.connector.matrix import ConnectorMatrix
 from opsdroid.connector.matrix.connector import MatrixException
 from opsdroid.connector.matrix.events import GenericMatrixRoomEvent
-from opsdroid.events import Message
+from opsdroid.events import Message, Reply
 from opsdroid.matchers import match_regex
 from opsdroid.skill import Skill
 from opsdroid.database.matrix import memory_in_event_room
@@ -27,10 +27,15 @@ def rich_response(message, body, formatted_body):
                 "format": "org.matrix.custom.html",
                 "formatted_body": dedent(formatted_body),
                 "msgtype": "m.notice" if message.connector.send_m_notice else "m.text",
+                "m.relates_to": {
+                    "m.in_reply_to": {
+                        "event_id": message.event_id,
+                    },
+                },
             },
         )
     else:
-        return Message(body)
+        return Reply(body, linked_event=message)
 
 
 class GitHubLinks(Skill):
@@ -59,7 +64,7 @@ class GitHubLinks(Skill):
         LOG.debug("Got Issue info: %s", issue)
 
         if issue is None:
-            await message.respond(f"Couldn't lookup {org}/{repo}#{issue_number}.")
+            await message.respond(Reply(f"Couldn't lookup {org}/{repo}#{issue_number}.", linked_event=message))
             return
 
         labels = f" 🏷️{' '.join([l['name'] for l in issue['labels']])}" if issue['labels'] else ""
