@@ -63,7 +63,7 @@ class GitHubLinks(Skill):
         repo = message.entities['repository']['value'] or default_repo
         issue_number = message.entities['issue_number']['value']
         if default_org is None or default_repo is None:
-            await message.respond(Reply("No default repo is set, use `!github default_repo <repo>` to set one.",
+            await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
                                         linked_event=message))
             return
 
