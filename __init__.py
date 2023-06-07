@@ -57,9 +57,16 @@ class GitHubLinks(Skill):
     @match_regex(ISSUE_REGEX)
     @memory_in_event_room
     async def linkify(self, message):
-        repo = message.entities['repository']['value'] or await self.opsdroid.memory.get("default_repo")
-        org = message.entities['organization']['value'] or await self.opsdroid.memory.get("default_org")
+        default_repo = await self.opsdroid.memory.get("default_repo")
+        default_org = await self.opsdroid.memory.get("default_org")
+        org = message.entities['organization']['value'] or default_org
+        repo = message.entities['repository']['value'] or default_repo
         issue_number = message.entities['issue_number']['value']
+        if default_org is None or default_repo is None:
+            await message.respond(Reply("No default repo is set, use `!github default_repo <repo>` to set one.",
+                                        linked_event=message))
+            return
+
         issue = await self.lookup_issue(org, repo, issue_number)
         LOG.debug("Got Issue info: %s", issue)
 
