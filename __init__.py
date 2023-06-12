@@ -89,9 +89,9 @@ class GitHubLinks(Skill):
             milestone_html = f"🪧{issue['milestone']['title']}"
         response = rich_response(
             message,
-            f"{issue['title']} ({issue['url']}){labels}{milestone}",
+            f"{issue['title']} ({issue['html_url']}){labels}{milestone}",
             f"""\
-            <a href={issue['url']}>{issue['title']}</a> #{issue['number']} {html_labels}{milestone_html}
+            <a href={issue['html_url']}>{issue['title']}</a> #{issue['number']} {html_labels}{milestone_html}
             """,
         )
         await message.respond(response)
@@ -102,8 +102,9 @@ class GitHubLinks(Skill):
         if isinstance(message.connector, ConnectorMatrix):
             power_levels = (await message.connector.connection.room_get_state_event(message.target,
                                                                                     "m.room.power_levels")).content
-            admin = power_levels['events']['m.room.power_levels']
-            user_pl = power_levels['users'].get(message.user_id, power_levels['users_default'])
+            # TODO: Make this get the power level required to set dev.opsdroid.database
+            admin = power_levels.get('events', {}).get('m.room.power_levels', 100)
+            user_pl = power_levels.get('users', {}).get(message.user_id, power_levels.get('users_default', 0))
             if user_pl < admin:
                 await message.respond(f"Not authorised, you must have at least power level {admin}")
                 return
@@ -120,4 +121,3 @@ class GitHubLinks(Skill):
             return
 
         await message.respond(f"Set default repo to {org}/{repo}")
-
