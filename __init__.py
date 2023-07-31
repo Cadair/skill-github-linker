@@ -15,7 +15,7 @@ LOG = logging.getLogger(__name__)
 
 # This regex is taken from https://github.com/sindresorhus/issue-regex under the MIT license
 REPO_REGEX = r"(?:(?<organization>[a-zA-Z\d](?:[a-zA-Z\d-]{0,37}[a-zA-Z\d])?)\/(?<repository>[\w.-]{1,100}))"
-ISSUE_REGEX = r"(?<!\w)" + REPO_REGEX + r"?(?<!(?:\/\.{1,2}))#(?<issue_number>[1-9]\d{0,9})\b"
+ISSUE_REGEX = REPO_REGEX + r"?#(?<issue_number>[1-9]\d{0,9})\b"
 
 
 def rich_response(message, body, formatted_body):
@@ -54,7 +54,7 @@ class GitHubLinks(Skill):
                     return
                 return await response.json()
 
-    @match_regex(ISSUE_REGEX)
+    @match_regex(ISSUE_REGEX, matching_condition="search")
     @memory_in_event_room
     async def linkify(self, message):
         default_repo = await self.opsdroid.memory.get("default_repo")
@@ -63,6 +63,7 @@ class GitHubLinks(Skill):
         repo = message.entities['repository']['value'] or default_repo
         issue_number = message.entities['issue_number']['value']
         if org is None or repo is None:
+            return
             reminder_sent = await self.opsdroid.memory.get("default_repo_reminder_sent")
             if not reminder_sent:
                 await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
