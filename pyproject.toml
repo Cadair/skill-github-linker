@@ -8,7 +8,13 @@ authors = [{name = "Stuart Mumford", email = "stuart@cadair.com"}]
 readme = "README.md"
 license = {file = "LICENSE"}
 classifiers = ["License :: OSI Approved :: GPL License"]
-dynamic = ["version", "description"]
+version = "0.1"
+description = "A skill for linking to GitHub issues and PRs"
 
 [project.urls]
 Home = "https://github.com/Cadair/skill-github-linker"
+
+dependencies = [
+    "opsdroid[connector_matrix]",
+    "aiohttp",
+]

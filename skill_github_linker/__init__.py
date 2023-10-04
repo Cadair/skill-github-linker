@@ -54,25 +54,30 @@ class GitHubLinks(Skill):
                     return
                 return await response.json()
 
-    @match_regex(ISSUE_REGEX, matching_condition="search")
+    @match_regex(ISSUE_REGEX, matching_condition="findall")
     @memory_in_event_room
     async def linkify(self, message):
         default_repo = await self.opsdroid.memory.get("default_repo")
         default_org = await self.opsdroid.memory.get("default_org")
-        org = message.entities['organization']['value'] or default_org
-        repo = message.entities['repository']['value'] or default_repo
-        issue_number = message.entities['issue_number']['value']
-        if org is None or repo is None:
-            return
-            reminder_sent = await self.opsdroid.memory.get("default_repo_reminder_sent")
-            if not reminder_sent:
-                await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
-                                            linked_event=message))
-                try:
-                    await self.opsdroid.memory.put("default_repo_reminder_sent", True)
-                except Exception:
-                    pass
-            return
+        for match in message.regex:
+            groupdict = match.groupdict()
+            org = groupdict.get('organization', default_org)
+            repo = groupdict.get('repository', default_repo)
+            issue_number = groupdict['issue_number']
+            if org is None or repo is None:
+                return
+                reminder_sent = await self.opsdroid.memory.get("default_repo_reminder_sent")
+                if not reminder_sent:
+                    await message.respond(Reply("No default repo is set, use `!github default_repo org/repo` to set one.",
+                                                linked_event=message))
+                    try:
+                        await self.opsdroid.memory.put("default_repo_reminder_sent", True)
+                    except Exception:
+                        pass
+                return
+            await self.linkify_match(message, org, repo, issue_number)
+
+    async def linkify_match(self, message, org, repo, issue_number):
 
         issue = await self.lookup_issue(org, repo, issue_number)
         LOG.debug("Got Issue info: %s", issue)
