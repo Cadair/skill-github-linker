@@ -1,0 +1,14 @@
+[build-system]
+requires = ["flit_core >=3.2,<4"]
+build-backend = "flit_core.buildapi"
+
+[project]
+name = "skill_github_linker"
+authors = [{name = "Stuart Mumford", email = "stuart@cadair.com"}]
+readme = "README.md"
+license = {file = "LICENSE"}
+classifiers = ["License :: OSI Approved :: GPL License"]
+dynamic = ["version", "description"]
+
+[project.urls]
+Home = "https://github.com/Cadair/skill-github-linker"
