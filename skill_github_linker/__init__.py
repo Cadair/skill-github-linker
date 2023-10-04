@@ -62,8 +62,8 @@ class GitHubLinks(Skill):
         for match in message.regex:
             groupdict = match.groupdict()
             LOG.debug(groupdict)
-            org = groupdict.get('organization', default_org)
-            repo = groupdict.get('repository', default_repo)
+            org = groupdict.get('organization') or default_org
+            repo = groupdict.get('repository') or default_repo
             issue_number = groupdict['issue_number']
             if org is None or repo is None:
                 return
