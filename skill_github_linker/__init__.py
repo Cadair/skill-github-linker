@@ -15,7 +15,9 @@ LOG = logging.getLogger(__name__)
 
 # This regex is taken from https://github.com/sindresorhus/issue-regex under the MIT license
 REPO_REGEX = r"(?:(?<organization>[a-zA-Z\d](?:[a-zA-Z\d-]{0,37}[a-zA-Z\d])?)\/(?<repository>[\w.-]{1,100}))"
-ISSUE_REGEX = REPO_REGEX + r"?#(?<issue_number>[1-9]\d{0,9})\b"
+ISSUE_NUMBER_REGEX = r"(?<issue_number>[1-9]\d{0,9})\b"
+ISSUE_REGEX = REPO_REGEX + "?#" + ISSUE_NUMBER_REGEX
+URL_REGEX = r"https://github.com/" + REPO_REGEX + "/(issues|pull)/" + ISSUE_NUMBER_REGEX
 
 
 def rich_response(message, body, formatted_body):
@@ -54,6 +56,7 @@ class GitHubLinks(Skill):
                     return
                 return await response.json()
 
+    @match_regex(URL_REGEX, matching_condition="findall")
     @match_regex(ISSUE_REGEX, matching_condition="findall")
     @memory_in_event_room
     async def linkify(self, message):
